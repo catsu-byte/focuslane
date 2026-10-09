@@ -1,0 +1,15 @@
+const MODES={focus:{label:'Focus session',button:'Start focus'},short:{label:'Short break',button:'Start break'},long:{label:'Long break',button:'Start break'}};
+const settings=JSON.parse(localStorage.getItem('focuslane-settings')||'{"focus":25,"short":5,"long":15}');
+const today=new Date().toISOString().slice(0,10); let day=JSON.parse(localStorage.getItem(`focuslane-${today}`)||'{"completed":0,"minutes":0}');
+let mode='focus',remaining=settings.focus*60,total=remaining,running=false,interval=null;
+const timer=document.querySelector('#timer'); const progress=document.querySelector('#progress'); const start=document.querySelector('#start');
+
+function render(){const mins=Math.floor(remaining/60);const secs=remaining%60;timer.textContent=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;document.title=`${timer.textContent} — Focuslane`;progress.style.strokeDashoffset=String(729*(1-remaining/total));document.querySelector('#mode-label').textContent=MODES[mode].label;document.querySelector('#session-label').textContent=`Session ${day.completed+1}`;document.querySelector('#completed').textContent=day.completed;document.querySelector('#minutes').textContent=day.minutes;start.textContent=running?'Pause':MODES[mode].button;}
+function selectMode(next){clearInterval(interval);running=false;mode=next;total=settings[mode]*60;remaining=total;document.querySelectorAll('[data-mode]').forEach(button=>button.classList.toggle('active',button.dataset.mode===mode));render();}
+function chime(){try{const audio=new AudioContext();const tone=audio.createOscillator();const gain=audio.createGain();tone.frequency.value=660;gain.gain.setValueAtTime(.08,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.7);tone.connect(gain).connect(audio.destination);tone.start();tone.stop(audio.currentTime+.7);}catch{} }
+function tick(){remaining-=1;if(remaining<=0){clearInterval(interval);running=false;remaining=0;if(mode==='focus'){day.completed+=1;day.minutes+=settings.focus;localStorage.setItem(`focuslane-${today}`,JSON.stringify(day));}render();chime();return;}render();}
+start.addEventListener('click',()=>{running=!running;if(running)interval=setInterval(tick,1000);else clearInterval(interval);render();});
+document.querySelector('#secondary').addEventListener('click',()=>selectMode(mode));document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>selectMode(button.dataset.mode)));
+const form=document.querySelector('#settings');Object.entries(settings).forEach(([key,value])=>form.elements[key].value=value);form.addEventListener('input',()=>{for(const key of Object.keys(settings))settings[key]=Math.max(1,Number(form.elements[key].value));localStorage.setItem('focuslane-settings',JSON.stringify(settings));selectMode(mode);});
+document.querySelector('#reset-day').addEventListener('click',()=>{day={completed:0,minutes:0};localStorage.setItem(`focuslane-${today}`,JSON.stringify(day));selectMode(mode);});render();
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));

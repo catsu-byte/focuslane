@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17231d">
+  <meta name="description" content="A calm, offline focus timer with local daily progress.">
+  <title>Focuslane — Quiet focus timer</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app">
+    <header><a class="brand" href="./"><span></span>Focuslane</a><button id="reset-day" class="link-button">Reset today</button></header>
+    <section class="focus-panel">
+      <div class="mode-switch" aria-label="Timer mode"><button data-mode="focus" class="active">Focus</button><button data-mode="short">Short break</button><button data-mode="long">Long break</button></div>
+      <div class="timer-wrap">
+        <svg class="ring" viewBox="0 0 260 260" aria-hidden="true"><circle class="track" cx="130" cy="130" r="116"/><circle id="progress" cx="130" cy="130" r="116"/></svg>
+        <div class="timer-copy"><p id="mode-label">Focus session</p><time id="timer">25:00</time><span id="session-label">Session 1</span></div>
+      </div>
+      <div class="actions"><button id="secondary" class="secondary">Reset</button><button id="start" class="primary">Start focus</button></div>
+    </section>
+
+    <aside class="day-panel">
+      <div><p class="eyebrow">Today</p><h1>Small sessions.<br>Real progress.</h1><p class="intro">One task at a time. Your progress stays in this browser.</p></div>
+      <div class="stats"><div><strong id="completed">0</strong><span>focus sessions</span></div><div><strong id="minutes">0</strong><span>minutes focused</span></div></div>
+      <form id="settings">
+        <p class="eyebrow">Durations</p>
+        <div class="setting-grid"><label>Focus<input name="focus" type="number" min="1" max="120" value="25"><span>min</span></label><label>Short break<input name="short" type="number" min="1" max="60" value="5"><span>min</span></label><label>Long break<input name="long" type="number" min="1" max="60" value="15"><span>min</span></label></div>
+      </form>
+    </aside>
+  </main>
+  <script src="./app.js" defer></script>
+</body>
+</html>
